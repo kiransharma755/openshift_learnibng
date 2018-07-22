@@ -7,3 +7,44 @@ command
 type -a python36
 
 gives the location of the executable
+
+
+
+https://help.dreamhost.com/hc/en-us/articles/115000695551-Installing-and-using-virtualenv-with-Python-3
+
+Make a note of the full file path to the custom version of Python you just installed. If you've followed the instructions in the installation article, the full path is:
+[server]$ which python3
+/home/username/opt/python-3.6.2/bin/python
+Navigate to your site's directory, where you'll create the new virtual environment:
+[server]$ cd ~/example.com
+Create the virtual environment while you specify the version of Python you wish to use. The following command creates 'my_project' in the first path, and uses the -p flag to specify the full path to the Python3 version you just installed:
+[server]$ virtualenv ~/example.com/my_project -p /home/example_username/opt/python-3.6.2/bin/python3
+
+Running virtualenv with interpreter /home/example_username/opt/python-3.6.2/bin/python3
+Using base prefix '/home/example_username/opt/python-3.6.2'
+New python executable in /home/example_username/example.com/env/bin/python3
+Also creating executable in /home/example_username/example.com/env/bin/python
+Installing setuptools, pip, wheel...done.
+This command creates a local copy of your environment specific to this website. While working on this website, you should activate the local environment in order to make sure you're working with the right versions of your tools and packages.
+To activate the new virtual environment, run the following:
+[server]$ source my_project/bin/activate
+The name of the current virtual environment appears to the left of the prompt. For example:
+(my_project) [server]$ 
+To verify the correct Python version, run the following:
+[server]$ python -V
+Python 3.6.2
+Any package that you install using pip is now placed in the virtual environments project folder, isolated from the global Python installation.
+
+Deactivating your virtualenv
+When finished working in the virtual environment, you can deactivate it by running the following:
+
+[server]$ deactivate
+This puts you back into your Shell user's default settings.
+Deleting your virtual environment
+To delete a virtual environment, simply delete the project folder. Using the previous example, run the following command:
+
+[server]$ rm -rf /home/username/example.com/my_project
+Installing custom modules
+View the following article for information on how to use pip to install Python modules.
+
+Using pip to install Python 3 modules
