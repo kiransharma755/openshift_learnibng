@@ -1,0 +1,6 @@
+No images or templates are loaded for this project or the shared openshift namespace. An image or template is required to add content.
+
+To add an image stream or template from a file, use the editor in the Import YAML / JSON tab, or run the following command:
+
+oc create -f <filename> -n my-project
+Back to overview
