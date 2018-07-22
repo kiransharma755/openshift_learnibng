@@ -68,13 +68,12 @@ You should now be able to run commands like the following to install packages fo
 $ pip3 install foo
 
 
-======or
-curl https://bootstrap.pypa.io/get-pip.py | python3.4
-Or if you don't have curl for some reason:
-
+======or we can do 
+curl https://bootstrap.pypa.io/get-pip.py | python3.6
+Or wget eg
 wget https://bootstrap.pypa.io/get-pip.py
-python3.4 get-pip.py
-After this you should be able to run
+python3.6 get-pip.py
+now, you can use pip3
 
 $ pip3
 
