@@ -1,0 +1,9 @@
+kubectl get pods -o wide
+varaible -- in .bachrc
+
+export AWS_DEFAULT_REGION=us-east-2
+export ORG_NAME=bipratech2
+export ZONES=us-east-2a,us-east-2b,us-east-2c
+export NAME=$ORG_NAME.k8s.local
+export BUCKET_NAME=kiran-k82-demo
+export KOPS_STATE_STORE=s3://$BUCKET_NAME
