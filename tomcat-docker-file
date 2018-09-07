@@ -1,0 +1,87 @@
+FROM centos:7
+
+MAINTAINER kiran_sharma@freddoemac.com
+
+
+ENV container docker
+
+ENV JAVA_HOME /usr/lib/jvm/jre
+ENV CATALINA_PID /pkgs/tomcat/temp/tomcat.pid
+ENV CATALINA_HOME /pkgs/tomcat
+ENV CATALINA_BASE /pkgs/tomcat
+ENV PATH $CATALINA_HOME/bin:$PATH
+RUN mkdir -p "$CATALINA_HOME"
+WORKDIR $CATALINA_HOME
+
+
+RUN yum -y update
+RUN yum -y install sudo \
+	tar \
+	gzip \
+	openssh-clients \
+	vi \
+	find
+
+RUN groupadd tomcat
+RUN useradd -M -s /bin/nologin -g tomcat -d /pkgs/tomcat tomcat
+
+ADD apache-tomcat-9.0.10.tar.gz /pkgs/
+RUN tar -xvfz apache-tomcat-9.0.10.tar.gz 
+
+RUN mv /opt/apache-tomcat-9.0.10 /opt/pkgs
+
+
+# Add tomcat-user.xml
+COPY tomcat-users.xml  /pkgs/tomcat/conf/tomcat-users.xml
+
+RUN cd /pkgs/tomcat; \
+	chgrp -R tomcat /pkgs/tomcat; \
+	chmod -R g+r conf; \
+	chmod g+x conf; \
+	chown -R tomcat /pkgs/tomcat/webapps/; \
+	chown -R tomcat /pkgs/tomcat/work/; \
+	chown -R tomcat /pkgs/tomcat/temp/; \
+	chown -R tomcat /pkgs/tomcat/logs/
+
+
+EXPOSE 8080
+VOLUME "/pkgs/tomcat/webapps"
+WORKDIR /pkgs/tomcat
+
+#start Tomcat
+CMD ["/opt/tomcat/bin/catalina.sh", "run"]
+
+
+
+
+===============
+we can use inside 
+
+<Context docBase="/opt/webapp/" path="" reloadable="false"></Context>
+docker file
+
+
+https://github.com/gotoworld/base-images-library/blob/master/tomcat/centos7-oracle8jre-tomcat8-confenv/entrypoint.sh
+
+
+
+
+export CATALINA_OPTS="$CATALINA_OPTS ${JAVA_OPTS}"
+
+exec ${CATALINA_HOME}/bin/catalina.sh run
+
+
+
+
+https://github.com/jmmorenogavira/docker-tomcat/tree/master/files
+
+
+
+docker build -t "ServidorTomcat8" .
+
+
+ENV JAVA_HOME /opt/jdk1.7.0_55
+
+compose
+https://github.com/joney000/Docker-Tomcat-User-Xml/blob/master/Dockerfile
+
