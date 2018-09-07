@@ -103,3 +103,9 @@ https://lrs.aws.training/defaultui/launch.aspx?configuration=&package=cpeint_en_
 
 # autogeneration of rsa key 
 ssh-keygen -q -t rsa -N "" -f $KEYFILE
+
+
+list for tomcat dockerfile
+https://github.com/gotoworld/base-images-library/blob/master/tomcat/centos7-oracle8jre-tomcat8-confenv/server.xml
+
+
