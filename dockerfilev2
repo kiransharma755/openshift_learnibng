@@ -1,0 +1,53 @@
+FROM  centos:7
+
+MAINTAINER kiran_sharma@freddoemac.com
+ENV TOMCAT_MAJOR 9
+ENV TOMCAT_VERSION 9.0.10
+
+ENV TOMCAT_BINARY=apache-tomcat-$TOMCAT_VERSION.tar.gz
+ENV CATALINA_PID /pkgs/tomcat/temp/tomcat.pid
+ENV CATALINA_HOME /pkgs/tomcat
+ENV CATALINA_BASE /pkgs/tomcat
+ENV PATH $CATALINA_HOME/bin:$PATH
+RUN mkdir -p "$CATALINA_HOME"
+WORKDIR $CATALINA_HOME
+
+#install jdk
+RUN yum install -y wget
+ENV JAVA_VERSION 8u181
+ENV BUILD_VERSION b14
+
+RUN wget --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" "http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/jdk-8u181-linux-x64.tar.gz" -O /tmp//jdk-8u181-linux-x64.tar.gz
+RUN tar -xvf  /tmp/jdk-8u181-linux-x64.tar.gz -C /usr/local
+
+RUN alternatives --install /usr/bin/java java /usr/local/jdk1.8.0_181/bin/java 200000
+RUN alternatives --install /usr/bin/javaws javaws /usr/local/jdk1.8.0_181//bin/javaws 200000
+RUN alternatives --install /usr/bin/javac javac /usr/local/jdk1.8.0_181//bin/javac 200000
+
+# java home
+ENV JAVA_HOME /usr/local/jdk1.8.0_181/
+
+#tomcat installation
+
+ENV URL https://archive.apache.org/dist/tomcat/tomcat-$TOMCAT_MAJOR/v$TOMCAT_VERSION/bin/apache-tomcat-$TOMCAT_VERSION.tar.gz
+RUN cd /tmp && curl -O $URL
+
+RUN tar xvf /tmp/$TOMCAT_BINARY -C $CATALINA_HOME  --strip-components=1
+
+RUN rm -rf bin/*.bat
+RUN rm -rf /tmp/$TOMCAT_BINARY
+RUN rm -rf webapps/*
+
+
+# Create tomcat user
+RUN groupadd -r tomcat && \
+ useradd -g tomcat --no-create-home --home-dir ${CATALINA_HOME} -s /sbin/nologin  -c "Tomcat user" tomcat && \
+ chown -R tomcat:tomcat ${CATALINA_HOME}
+
+USER tomcat
+EXPOSE 8080
+
+
+#start Tomcat
+#CMD ["/pkgs/tomcat/bin/catalina.sh", "run"]
+
