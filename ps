@@ -1,0 +1,127 @@
+ <#
+ 4.
+ Group Membership
+ Takes a user name and a tool and ensures user is in top level global group and tool global group
+ ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------#>
+
+
+#Parameter setup
+
+param([string] $u = '', 
+      [string] $t = '')
+
+      
+#Check if user was entered and display error if blank
+if($u -eq '')
+{        
+        
+    Write-Host "You must enter a user's name (-u). It cannot be blank"
+    Write-Host
+    Start-Sleep -s 1
+
+    #Setup ability to display both errors if needed
+    if($t -eq '')
+    {
+        Write-Host "You have not entered a tool. Please enter a tool with the parameter -t"
+        Write-Host
+        Start-Sleep -s 1    
+    }
+    exit        
+}
+#Check if tool was entered and display error if not
+if($t -eq '')
+{
+    Write-Host "You have not entered a tool. Please enter a tool with the parameter -t"
+    Write-Host
+    Start-Sleep -s 1
+    exit    
+}
+else
+{
+    #Set up context variable
+    $context = ''
+
+    #Check if OU exists in context using distinguishedname and display error if not
+    $OU=Get-ADOrganizationalUnit -Filter * -SearchBase $context | Where-Object {$_.distinguishedname -like "*$t*"}
+    if($OU -eq $null)
+    {
+        Write-Host
+        Write-Host "The parameter entered for -t does not exist under your main OU"
+        Start-Sleep -s 2
+
+        #Check if user exists and display error if not (Allow double error display if necessary)
+        $user = Get-ADUser -Filter ("samaccountname -like '*$u*'")
+        if($user -eq $null)
+        {
+           Write-Host
+           Write-Host "User does not exist with the samaccountname entered..." 
+           Start-Sleep -s 2 
+        }
+        exit
+    }
+    else
+    {
+        #Check if user exists and display error if not
+        $user = Get-ADUser -Filter ("samaccountname -like '*$u*'")
+        if($user -eq $null)
+        {
+           Write-Host
+           Write-Host "User does not exist with the samaccountname entered..." 
+           Start-Sleep -s 2 
+        }
+        else
+        {
+             #Store group names
+             $globalgroup = 'ABC.global.users'
+             $localgroup = "$t.global.users"
+             
+             #Display samaccountname and check if user is in required groups
+             $sam = $user.samaccountname
+             Write-Host
+             Write-Host "Samaccount name: $sam"
+             $g = Get-ADPrincipalGroupMembership $user | Where-Object{$_.distinguishedname -like "*$globalgroup*"}
+             $l = Get-ADPrincipalGroupMembership $user | Where-Object{$_.distinguishedname -like "*$localgroup*"}
+
+             
+             #Add user to groups if needed and display status message
+             if($g -ne $null -and $l -ne $null)
+             {
+                Write-Host
+                Write-Host "$sam is already in $globalgroup and $localgroup so no change was made"
+                Start-Sleep -s 2  
+             }
+             else
+             {
+                if($g -ne $null)
+                {
+                    Write-Host
+                    Write-Host "$sam is already in $globalgroup"
+                    Start-Sleep -s 1  
+                }
+                if($l -ne $null)
+                {
+                    Write-Host
+                    Write-Host "$sam is already in $localgroup"
+                    Start-Sleep -s 1
+                }
+             }
+             if($g -eq $null)
+             {
+                $group = Get-ADGroup -Filter ("Name -like '$globalgroup'")
+                Add-ADGroupMember $group -Members $user
+                Write-Host
+                Write-Host "$sam has been added to $globalgroup"
+                Start-Sleep -s 1
+             }
+             if($l -eq $null)
+             {
+                $group = Get-ADGroup -Filter ("Name -like '$localgroup'")
+                Add-ADGroupMember $group -Members $user
+                Write-Host
+                Write-Host "$sam has been added to $localgroup"
+                Start-Sleep -s 1
+             }
+             Start-Sleep -s 2  
+        }
+    }
+}
